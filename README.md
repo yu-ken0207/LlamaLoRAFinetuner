@@ -38,7 +38,7 @@
 2. 創建虛擬環境並安裝依賴：
    ```bash
    conda env create -f environment.yml
-   conda activate train_llama
+   conda activate LlamaLoRAFinetuner
    ```
 3. 安裝額外的 Python 依賴（如有需要）：
    ```bash
