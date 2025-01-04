@@ -1,0 +1,49 @@
+此程式碼的訓練指令：
+
+python main.py --dataset_name "yu-ken0207/output_high_descs_with_actions" --instruction "請閱讀高階描述（high_desc），並執行相應的行為（action），如移動到某個位置或拾取物品" --input_key "high_desc" --output_key "action" --local_path "outputs_TaskActionClassifierAgent" --hub_path "yu-ken0207/TaskActionClassifierAgent" --token "your_hf_token" --task_name "TaskActionClassifier"
+
+python main.py --dataset_name "yu-ken0207/output_high_descs_with_high_descs" --instruction "以下是一個總體任務描述和其對應的高階步驟。請學習總體任務與高階步驟的關係，並根據高階步驟生成總體任務描述。" --input_key "task_desc" --output_key "high_descs" --local_path "outputs_TaskDecomposerAgent" --hub_path "yu-ken0207/TaskDecomposerAgent" --token "your_hf_token" --task_name "TaskDecomposer"
+
+python main.py --dataset_name "yu-ken0207/output_high_descs_with_policy_commands" --instruction "你是一個室內導航助手。請根據子任務描述（subTask_descs），決定下一步需要執行的動作（action）" --input_key "subTask_descs" --output_key "action" --local_path "outputs_SubTaskPlannerAgent" --hub_path "yu-ken0207/SubTaskPlannerAgent" --token "your_hf_token" --task_name "SubTaskPlanner"
+
+
+訓練後模型儲存位置：
+yu-ken0207/TaskActionClassifierAgent
+
+output_high_descs_with_actions 資料集：
+範例：
+    {"high_desc": "Turn left and walk towards the fridge, then hang a left and walk up to the sink.", "action": "GotoLocation"}
+    {"high_desc": "Pick up the large golden spoon with a blue handle off of the counter in front of the sink.", "action": "PickupObject"}
+    {"high_desc": "Look up at the sink.", "action": "GotoLocation"}
+    {"high_desc": "Put the golden spoon in the sink and turn on the water, after a couple seconds turn the water off and remove the now clean golden spoon.", "action": "CleanObject"}
+    {"high_desc": "Turn around and walk over to the left side of the kitchen island.", "action": "GotoLocation"}
+    {"high_desc": "Put the clean golden spoon on the kitchen island.", "action": "PutObject"}
+
+
+訓練後模型儲存位置：
+yu-ken0207/TaskDecomposerAgent
+
+output_high_descs_with_high_descs 資料集：
+範例：
+    {"task_desc": "Put a clean large golden spoon on the kitchen island.", "high_descs": ["Turn left and walk towards the fridge, then hang a left and walk up to the sink.", "Pick up the large golden spoon with a blue handle off of the counter in front of the sink.", "Look up at the sink.", "Put the golden spoon in the sink and turn on the water, after a couple seconds turn the water off and remove the now clean golden spoon.", "Turn around and walk over to the left side of the kitchen island.", "Put the clean golden spoon on the kitchen island."]}
+    {"task_desc": "Clean a ladle and place it on a table.", "high_descs": ["Walk to the kitchen counter behind you.", "Grab a ladle off the counter.", "Locate the kitchen sink.", "Place the ladle inside the sink, rinse it, then grab the ladle again.", "Walk to the kitchen table on the salt and pepper shakers' side.", "Place the ladle on the table."]}
+    {"task_desc": "wash the spoon by the sink, put it on the kitchen island", "high_descs": ["turn left, turn left ,walk to the sink", "grab the spoon by the sink", "walk towards the sink a little", "put the spoon in the sink, wash the spoon with water,take the spoon out", "turn around, walk to the kitchen island", "put the spoon on the kitchen island"]}
+    {"task_desc": "Wash a ladle and place on the table. ", "high_descs": ["Walk forward then turn to the left and face the counter.", "Pick up the ladle from the counter. ", "Turn to the right and walk to the sink. Make a left to face it.", "Put the ladle in the sink and turn on the water. Wash the ladle and drain the water. ", "Pick up the ladle and turn around and step to the left. Go forward to the table. Make a right to face the table.", "Place the ladle on the table. "]}
+    {"task_desc": "Put a cleaned scoop on the island.", "high_descs": ["move to the counter to the right of the stove", "pick up a scoop from the counter", "move to the sink to the right of you", "clean the scoop in the sink", "move to the island to the right of the fridge", "put the scoop on the island"]}
+    {"task_desc": "Put the ladle on the table", "high_descs": ["Make a step on your right then turn left move forward head to the counter on your left", "Pick up the ladle beside the salt on the counter", "Turn right walk forward then turn left on the sink", "Put the ladle in the sink and rinse it", "Turn left and head to the table past fridge", "Put the ladle in front of the bread on the table"]}
+    {"task_desc": "Put a clean golden spoon on the kitchen island.", "high_descs": ["Turn right and walk up to the kitchen island.", "Pick up the large golden spoon with a blue handle off of the island.", "Walk over to the kitchen sink.", "Put the large golden spoon in the sink and turn on the water, after a couple seconds turn off the water and remove the now clean golden spoon.", "Turn around and walk back over to the kitchen island.", "Put the clean golden spoon on the kitchen island on top of the loaf of bread."]}
+    {"task_desc": "Put a clean ladle on the kitchen island. ", "high_descs": ["Turn to the island to your right. ", "Pick up the ladle, between the tomato's and the bowl, on the kitchen counter. ", "Turn to your right and go to the sink across from you. ", "Place the ladle on the plate in the sink, turn the water on, rinse the plate and the ladle in the sink, then remove the ladle from the sink. ", "Turn around and and go back to the middle of the kitchen island and turn to your right, facing the island. ", "Place the ladle on the loaf of bread, that is on the island. "]}
+
+
+
+訓練後模型儲存位置：
+yu-ken0207/SubTaskPlannerAgent
+
+output_high_descs_with_policy_commands 資料集：
+範例：
+    {"subTask_descs": "Turn left, walk to the vanity at the end", "action": "go to countertop 1"}
+    {"subTask_descs": "Open the second door from left of the cabinet under the sink, take the bottle out, close the cabinet", "action": "take soapbottle 4 from countertop 1"}
+    {"subTask_descs": "Turn around, to the toilet", "action": "go to toilet 1"}
+    {"subTask_descs": "Put the bottle on the toilet", "action": "put soapbottle 4 in/on toilet 1"}
+    {"subTask_descs": "Turn around to the left, and then the right to find the sink.", "action": "go to countertop 1"}
+    {"subTask_descs": "Open the bottom cabinet and pick up a bottle of lotion.", "action": "take soapbottle 4 from countertop 1"}
