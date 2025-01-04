@@ -1,6 +1,6 @@
 # environment.yml
 
-name: train_llama
+name: LlamaLoRAFinetuner
 channels:
   - defaults
 dependencies:
