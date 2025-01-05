@@ -32,13 +32,13 @@
 
 1. 克隆此倉庫：
    ```bash
-   git clone https://github.com/<your-repo-name>.git
-   cd <your-repo-name>
+   git clone https://github.com/LlamaLoRAFinetuner.git
+   cd LlamaLoRAFinetuner
    ```
 2. 創建虛擬環境並安裝依賴：
    ```bash
    conda env create -f environment.yml
-   conda activate train_llama
+   conda activate LlamaLoRAFinetuner
    ```
 3. 安裝額外的 Python 依賴（如有需要）：
    ```bash
