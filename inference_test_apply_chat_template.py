@@ -1,37 +1,51 @@
 from unsloth import FastLanguageModel
 from transformers import TextStreamer
+import torch
+
 
 def infer(model_path, instruction, input_text="", max_new_tokens=128):
-    # 加載模型和分詞器
+    # 加載模型和 tokenizer
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_path,
-        max_seq_length=512,  # 調整序列長度
+        max_seq_length=512,  # 設定最大序列長度
         dtype="float16",  # 使用 FP16
-        load_in_4bit=True,  # 加載 4-bit 模型（若適用）
+        load_in_4bit=True,  # 加載 4-bit 量化模型
     )
 
-    # 啟用推理加速
+    # 啟用推理模式
     FastLanguageModel.for_inference(model)
 
-    # 定義提示模板（與訓練一致）
-    alpaca_prompt = f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+    # 使用 ChatML 格式來構造對話
+    messages = [
+        {"role": "system", "content": "You are a helpful AI assistant."},
+        {"role": "user", "content": f"{instruction}\n\n{input_text}"}
+    ]
 
-    ### Instruction:
-    {instruction}
+    # 使用 apply_chat_template 來轉換輸入為 Chat 格式
+    inputs = tokenizer.apply_chat_template(
+        conversation=messages,
+        add_generation_prompt=True,  # 自動添加模型需要的提示
+        return_dict=True,
+        return_tensors="pt"  # 轉換為 PyTorch 張量
+    )
 
-    ### Input:
-    {input_text}
+    # 確保張量在模型所在設備上
+    inputs = {k: v.to(model.device) for k, v in inputs.items() if isinstance(v, torch.Tensor)}
 
-    ### Response:
-    """
+    # 生成文本
+    outputs = model.generate(
+        **inputs,
+        max_new_tokens=max_new_tokens,
+        temperature=0.7,  # 控制隨機性
+        top_p=0.9,  # 取前 90% 的概率質量
+        repetition_penalty=1.1,  # 避免重複
+    )
 
-    # 將輸入文本轉換為張量
-    inputs = tokenizer([alpaca_prompt], return_tensors="pt").to("cuda")
+    # 提取生成的文本（去掉輸入部分，只保留輸出）
+    generated_text = tokenizer.decode(outputs[0][len(inputs["input_ids"][0]):], skip_special_tokens=True).strip()
 
-    # 使用 TextStreamer 進行實時文本生成
-    text_streamer = TextStreamer(tokenizer)
-    _ = model.generate(**inputs, streamer=text_streamer, max_new_tokens=max_new_tokens)
-
+    # 印出生成的內容
+    print(generated_text)
 
 if __name__ == "__main__":
 
