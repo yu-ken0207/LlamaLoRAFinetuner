@@ -34,12 +34,18 @@ def infer(model_path, instruction, input_text="", max_new_tokens=128):
 
 
 if __name__ == "__main__":
-    # 模型保存的路徑
-    model_path = "outputs_TaskDecomposerAgent/unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit_TaskDecomposer_20250104_185454"
 
-    # 指令和輸入
-    instruction = "以下是一個總體任務描述和其對應的高階步驟。請學習總體任務與高階步驟的關係，並根據高階步驟生成總體任務描述。"
-    input_text = "Hold the clock and turn on the lamp."
+    # model_path = "outputs_TaskDecomposerAgent/unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit_TaskDecomposer_20250104_185454"
+    # instruction = "以下是一個總體任務描述和其對應的高階步驟。請學習總體任務與高階步驟的關係，並根據高階步驟生成總體任務描述。"
+    # input_text = "Hold the clock and turn on the lamp."
+    # infer(model_path, instruction, input_text)
 
-    # 執行推理
+    # model_path = "outputs_TaskActionClassifierAgent/unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit_TaskActionClassifier_20250104_184343"
+    # instruction = "請閱讀高階描述（high_desc），並執行相應的行為（action），如移動到某個位置或拾取物品"
+    # input_text = "Turn right and walk to the dresser."
+    # infer(model_path, instruction, input_text)
+
+    model_path = "outputs_SubTaskPlannerAgent/unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit_SubTaskPlanner_20250104_183624"
+    instruction = "你是一個室內導航助手。請根據子任務描述（subTask_descs），決定下一步需要執行的動作（action）"
+    input_text = "Pick the book up from the cabinet."
     infer(model_path, instruction, input_text)
