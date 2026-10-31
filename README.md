@@ -164,6 +164,7 @@ pip install -r requirements.txt
 
 ---
 
-## 授權
+## License
 
-此項目基於 Apache License 2.0 授權。詳細信息請參閱 `LICENSE` 文件。
+- 程式碼：Apache-2.0，見 [LICENSE](LICENSE)。
+- `data_process/alfworld/` 是 [ALFWorld](https://github.com/alfworld/alfworld) 的程式（MIT License，Copyright (c) 2020 Mohit Shridhar and others），授權見 [data_process/alfworld/LICENSE](data_process/alfworld/LICENSE)。
