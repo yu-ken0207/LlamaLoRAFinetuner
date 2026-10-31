@@ -138,6 +138,8 @@ llama.save_model(local_path="outputs", hub_path="your-hf-username/test-model", t
 
 ## 環境配置
 
+> **注意**：`requirements.txt` 與 `environment.yml` 是 2025 年 1 月訓練時的環境快照（torch 2.5.1、transformers 4.47.1、unsloth 2024.12），為了能重現結果沒有更新，其中不少套件已有公開的安全漏洞。只建議在自己的電腦上訓練與測試，不要用這個環境對外提供服務；要長期使用，請換成新版套件重新訓練驗證。
+
 若需重建環境，可使用提供的 `environment.yml` 文件：
 
 ```bash
