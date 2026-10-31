@@ -1,5 +1,7 @@
 # Llama 模型訓練
 
+> A reusable pipeline for LoRA fine-tuning Llama 3.1 8B Instruct (4-bit, with Unsloth): load a Hugging Face dataset by naming its input and output fields, train with an instruction template, run inference, and push the result to the Hugging Face Hub. Used to train three small planning agents for household robot tasks from ALFRED / ALFWorld data: task decomposition, step-to-command planning and action classification (adapters included in `outputs_*`).
+
 **Built with Llama**：`outputs_*` 資料夾裡的 LoRA 權重由 Meta Llama 3.1 微調而來，授權見最下方。
 
 ## 概述
@@ -34,7 +36,7 @@
 
 1. 克隆此倉庫：
    ```bash
-   git clone https://github.com/LlamaLoRAFinetuner.git
+   git clone https://github.com/yu-ken0207/LlamaLoRAFinetuner.git
    cd LlamaLoRAFinetuner
    ```
 2. 創建虛擬環境並安裝依賴：
@@ -129,7 +131,10 @@ llama.save_model(local_path="outputs", hub_path="your-hf-username/test-model", t
 * **`trainer_utils.py`** ：包含訓練工具和配置。
 * **`environment.yml`** ：Conda 環境配置文件。
 * **`requirements.txt`** ：使用 pip 的 Python 依賴列表。
-* **`inference_test.py`** ：用於測試模型推理的腳本。
+* **`inference_test_TextStreamer.py`**、**`inference_test_apply_chat_template.py`** ：測試模型推理的腳本（兩種提示寫法）。
+* **`training_script.txt`** ：三個 Agent 的訓練指令與資料範例。
+* **`data_process/`** ：從 ALFWorld 資料整理出訓練資料的程式，以及整理好的 jsonl。
+* **`outputs_*/`** ：訓練好的三個 LoRA 權重（任務拆解、子任務轉指令、動作分類）。
 
 ## 環境配置
 
