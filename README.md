@@ -1,5 +1,7 @@
 # Llama 模型訓練
 
+**Built with Llama**：`outputs_*` 資料夾裡的 LoRA 權重由 Meta Llama 3.1 微調而來，授權見最下方。
+
 ## 概述
 
 此程式碼包含一個完整的管道，用於訓練、微調及推理 Llama 模型。該管道包括以下組件：
@@ -168,3 +170,6 @@ pip install -r requirements.txt
 
 - 程式碼：Apache-2.0，見 [LICENSE](LICENSE)。
 - `data_process/alfworld/` 是 [ALFWorld](https://github.com/alfworld/alfworld) 的程式（MIT License，Copyright (c) 2020 Mohit Shridhar and others），授權見 [data_process/alfworld/LICENSE](data_process/alfworld/LICENSE)。
+- `outputs_*` 資料夾裡的 LoRA 權重與 tokenizer：由 Meta Llama 3.1 衍生，依 [Llama 3.1 Community License](LICENSE-LLAMA-3.1) 散布，使用時要遵守 [Acceptable Use Policy](USE_POLICY-LLAMA-3.1.md)，另見 [NOTICE](NOTICE)。
+
+Llama 3.1 is licensed under the Llama 3.1 Community License, Copyright © Meta Platforms, Inc. All Rights Reserved.
