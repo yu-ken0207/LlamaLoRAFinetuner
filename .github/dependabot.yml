@@ -1,0 +1,18 @@
+# 每月檢查 unsloth 有沒有新版，有的話開一個 PR，把 unsloth 和 datasets 一起升級。
+# unsloth 目前只支援 datasets 5.0 以前的版本，datasets 4.8.5 和跟著裝的 fsspec 各有一個已知漏洞；
+# 這個 PR 的自動檢查變綠，代表新版組合裝得起來，可以升級補掉漏洞。
+# 合併前要先在 NVIDIA 顯示卡上實測訓練和推論。
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: monthly
+    allow:
+      - dependency-name: "unsloth*"
+      - dependency-name: datasets
+    groups:
+      unsloth:
+        patterns:
+          - "unsloth*"
+          - datasets
