@@ -1,68 +1,64 @@
-# Llama 模型訓練
+# Llama LoRA Finetuner
+
+**English** | [繁體中文](README.zh-TW.md)
 
 [![Checks](https://github.com/yu-ken0207/LlamaLoRAFinetuner/actions/workflows/check.yml/badge.svg)](https://github.com/yu-ken0207/LlamaLoRAFinetuner/actions/workflows/check.yml)
 
-> A reusable pipeline for LoRA fine-tuning Llama 3.1 8B Instruct (4-bit, with Unsloth): load a Hugging Face dataset by naming its input and output fields, train with an instruction template, run inference, and push the result to the Hugging Face Hub. Used to train three small planning agents for household robot tasks from ALFRED / ALFWorld data: task decomposition, step-to-command planning and action classification (adapters included in `outputs_*`).
+A reusable pipeline for LoRA fine-tuning Llama 3.1 8B Instruct (4-bit, with Unsloth): load a Hugging Face dataset by naming its input and output fields, train with an instruction template, run inference, and push the result to the Hugging Face Hub. Used to train three small planning agents for household robot tasks from ALFRED / ALFWorld data: task decomposition, step-to-command planning, and action classification (adapters included in `outputs_*`).
 
-**Built with Llama**：`outputs_*` 資料夾裡的 LoRA 權重由 Meta Llama 3.1 微調而來，授權見最下方。
+**Built with Llama**: the LoRA weights in the `outputs_*` folders are fine-tuned from Meta Llama 3.1. See the license section at the bottom.
 
-## 概述
+## Overview
 
-此程式碼包含一個完整的管道，用於訓練、微調及推理 Llama 模型。該管道包括以下組件：
+The pipeline covers training, fine-tuning, and inference:
 
-1. **模型訓練** ：使用 LoRA（低秩適應）對 Llama 模型進行高效微調。
-2. **數據集處理** ：靈活加載和預處理數據集，支持自定義的輸入與輸出格式。
-3. **推理** ：使用已定義的提示模板生成模型預測。
-4. **Hugging Face 集成** ：保存並將模型推送到 Hugging Face Hub。
+1. **Training**: efficient fine-tuning of Llama with LoRA (low-rank adaptation)
+2. **Datasets**: load and preprocess datasets with configurable input and output fields
+3. **Inference**: generate predictions with the same prompt template used in training
+4. **Hugging Face integration**: save the model and push it to the Hugging Face Hub
 
----
+## Features
 
-## 功能特點
+* **LoRA fine-tuning**: lower resource needs
+* **Flexible datasets**: name the input and output fields to fit different formats
+* **Instruction tuning**: an instruction-following template for training and inference
+* **Fast inference**: 4-bit quantization and FP16
+* **Hugging Face Hub**: save and share models
 
-* **LoRA 微調** ：降低資源需求，實現高效微調。
-* **靈活的數據集支持** ：使用可配置的鍵名，輕鬆適配不同格式的數據集。
-* **基於指令學習** ：使用指令跟隨模板進行訓練和推理。
-* **優化推理** ：使用 4-bit 量化和 FP16 加速推理。
-* **Hugging Face Hub 集成** ：無縫保存和分享模型。
+## Installation
 
----
+### Prerequisites
 
-## 安裝與配置
+* Python 3.11+ (tested with 3.12)
+* An NVIDIA GPU (CUDA)
+* Conda (optional; venv also works)
 
-### 先決條件
+### Steps
 
-* Python 3.11+（實測 3.12）
-* NVIDIA 顯示卡（CUDA）
-* Conda（可選，用 venv 也可以）
-
-### 安裝
-
-1. 克隆此倉庫：
+1. Clone the repository:
    ```bash
    git clone https://github.com/yu-ken0207/LlamaLoRAFinetuner.git
    cd LlamaLoRAFinetuner
    ```
-2. 創建虛擬環境：
+2. Create the environment:
    ```bash
    conda env create -f environment.yml
    conda activate LlamaLoRAFinetuner
    ```
-3. 依顯示卡的 CUDA 版本安裝 torch（其他 CUDA 版本的指令見 [PyTorch 官網](https://pytorch.org/get-started/locally/)），例如 CUDA 13.0：
+3. Install torch for your GPU's CUDA version (commands for other versions are on the [PyTorch website](https://pytorch.org/get-started/locally/)). For CUDA 13.0:
    ```bash
    pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu130
    ```
-4. 安裝其他依賴：
+4. Install the other dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
----
+## Usage
 
-## 使用方法
+### Train
 
-### 訓練模型
-
-使用自定義數據集訓練 Llama 模型：
+Train on your own dataset (this example translates modern Chinese into Classical Chinese):
 
 ```bash
 python main.py \
@@ -77,9 +73,11 @@ python main.py \
   --task_name "translation_task"
 ```
 
-### 推理
+The commands used to train the three included agents are in `training_script.txt`.
 
-使用已訓練的模型進行推理：
+### Inference
+
+Run an included adapter (same as `inference_test_TextStreamer.py`; the prompt template must match the one used in training):
 
 ```python
 from unsloth import FastLanguageModel
@@ -95,7 +93,7 @@ def infer(model_path, instruction, input_text="", max_new_tokens=128):
 
     FastLanguageModel.for_inference(model)
 
-    alpaca_prompt = f"""以下是一個描述任務的指令，並附有提供進一步上下文的輸入內容。請撰寫適當的回應完成此請求。
+    alpaca_prompt = f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 
     ### Instruction:
     {instruction}
@@ -113,76 +111,68 @@ def infer(model_path, instruction, input_text="", max_new_tokens=128):
 
 infer(
     model_path="outputs_TaskDecomposerAgent/unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit_TaskDecomposer_20250104_185454",
-    instruction="將以下任務轉換為逐步可執行的行動。",
-    input_text="清理桌面並整理書籍。"
+    instruction="以下是一個總體任務描述和其對應的高階步驟。請學習總體任務與高階步驟的關係，並根據高階步驟生成總體任務描述。",
+    input_text="put some book on sidetable.",
 )
 ```
 
-### 將模型保存到 Hugging Face Hub
+The instructions are in Chinese because the agents were trained with Chinese instructions and English ALFWorld inputs.
 
-確保將訓練好的模型保存並推送到 Hugging Face Hub：
+### Push to the Hugging Face Hub
 
 ```python
 llama.save_model(local_path="outputs", hub_path="your-hf-username/test-model", token="your_hf_token", task_name="translation_task")
 ```
 
----
+## Files
 
----
+* **`main.py`**: entry point for training
+* **`llama_model.py`**: loads, fine-tunes, and saves the model
+* **`dataset_loader.py`**: loads and preprocesses datasets
+* **`trainer_utils.py`**: training settings
+* **`environment.yml`**: Conda environment
+* **`requirements.txt`**: Python dependencies for pip
+* **`inference_test_TextStreamer.py`**, **`inference_test_apply_chat_template.py`**: inference test scripts (two prompt styles)
+* **`training_script.txt`**: training commands and data samples for the three agents
+* **`data_process/`**: scripts that build the training data from ALFWorld, plus the resulting jsonl files
+* **`outputs_*/`**: the three trained LoRA adapters (task decomposition, sub-task to command, action classification)
 
-## 文件結構
+## Tested environment
 
-* **`main.py`** ：訓練模型的入口點。
-* **`llama_model.py`** ：處理模型的加載、微調和保存。
-* **`dataset_loader.py`** ：管理數據集的加載與預處理。
-* **`trainer_utils.py`** ：包含訓練工具和配置。
-* **`environment.yml`** ：Conda 環境配置文件。
-* **`requirements.txt`** ：使用 pip 的 Python 依賴列表。
-* **`inference_test_TextStreamer.py`**、**`inference_test_apply_chat_template.py`** ：測試模型推理的腳本（兩種提示寫法）。
-* **`training_script.txt`** ：三個 Agent 的訓練指令與資料範例。
-* **`data_process/`** ：從 ALFWorld 資料整理出訓練資料的程式，以及整理好的 jsonl。
-* **`outputs_*/`** ：訓練好的三個 LoRA 權重（任務拆解、子任務轉指令、動作分類）。
+`requirements.txt` lists versions tested in November 2026 (torch 2.14.1, transformers 5.17.0, trl 1.15.0, unsloth 2026.10.11) on Linux ARM64 with an NVIDIA Blackwell GPU, CUDA 13.0, and Python 3.12:
 
-## 環境配置
+* Training with the `main.py` flow for 30 steps brought the loss from 3.47 to 0.37, and the trained adapter outputs the correct action classes.
+* Both `inference_test_*.py` scripts work with the adapters in `outputs_*`.
 
-`requirements.txt` 是 2026 年 11 月實測過的版本（torch 2.14.1、transformers 5.17.0、trl 1.15.0、unsloth 2026.10.11），實測環境是 Linux ARM64、NVIDIA Blackwell 顯示卡、CUDA 13.0、Python 3.12：
+On x86, follow the same steps with the torch install command for your CUDA version; this was not tested on real hardware, but GitHub Actions checks that the dependency versions resolve on x86 with Python 3.11 and 3.12.
 
-* 照 `main.py` 的流程訓練 30 步，loss 從 3.47 降到 0.37；訓練出的權重載入後能輸出正確的動作類別。
-* 兩支 `inference_test_*.py` 載入 `outputs_*` 的權重推論正常。
+Remaining known vulnerabilities: unsloth currently supports only datasets versions before 5.0. datasets 4.8.5 and the fsspec version it pins each have one known vulnerability (in folder-based dataset builders and in Kerchunk reference files). This project uses neither. They will be fixed by upgrading once unsloth supports datasets 5.
 
-x86 電腦照同樣步驟、把 torch 換成自己 CUDA 版本的安裝指令即可，但沒有實測。
+The scripts in `data_process/` also need an ALFWorld environment; see the [ALFWorld](https://github.com/alfworld/alfworld) installation guide.
 
-已知還剩的漏洞：unsloth 目前只支援 datasets 5.0 以前的版本，datasets 4.8.5 與它限定版本的 fsspec 各有一個已知漏洞，分別出在「資料夾型資料集」與「Kerchunk 參考檔」，這個專案都沒有用到；等 unsloth 支援 datasets 5 再升級。
+The adapters in `outputs_*` were trained in January 2025 with torch 2.5.1, transformers 4.47.1, and unsloth 2024.12. The full package list from that time is in the git history.
 
-`data_process/` 的整理程式另外需要 ALFWorld 的環境，見 [ALFWorld](https://github.com/alfworld/alfworld) 的安裝說明。
+## Contributing
 
-`outputs_*` 的權重是 2025 年 1 月用 torch 2.5.1、transformers 4.47.1、unsloth 2024.12 訓練的，當時完整的套件清單在 git 歷史裡。
-
----
-
-## 貢獻指南
-
-1. Fork 此倉庫。
-2. 創建您的功能分支：
+1. Fork this repository.
+2. Create a feature branch:
    ```bash
    git checkout -b feature/new-feature
    ```
-3. 提交您的更改：
+3. Commit your changes:
    ```bash
    git commit -m "Add new feature"
    ```
-4. 推送到分支：
+4. Push the branch:
    ```bash
    git push origin feature/new-feature
    ```
-5. 開啟 Pull Request。
-
----
+5. Open a pull request.
 
 ## License
 
-- 程式碼：Apache-2.0，見 [LICENSE](LICENSE)。
-- `data_process/alfworld/` 是 [ALFWorld](https://github.com/alfworld/alfworld) 的程式（MIT License，Copyright (c) 2020 Mohit Shridhar and others），授權見 [data_process/alfworld/LICENSE](data_process/alfworld/LICENSE)。
-- `outputs_*` 資料夾裡的 LoRA 權重與 tokenizer：由 Meta Llama 3.1 衍生，依 [Llama 3.1 Community License](LICENSE-LLAMA-3.1) 散布，使用時要遵守 [Acceptable Use Policy](USE_POLICY-LLAMA-3.1.md)，另見 [NOTICE](NOTICE)。
+- Code: Apache-2.0, see [LICENSE](LICENSE).
+- `data_process/alfworld/` is code from [ALFWorld](https://github.com/alfworld/alfworld) (MIT License, Copyright (c) 2020 Mohit Shridhar and others); see [data_process/alfworld/LICENSE](data_process/alfworld/LICENSE).
+- The LoRA weights and tokenizers in `outputs_*`: derived from Meta Llama 3.1 and distributed under the [Llama 3.1 Community License](LICENSE-LLAMA-3.1). Use must follow the [Acceptable Use Policy](USE_POLICY-LLAMA-3.1.md); see also [NOTICE](NOTICE).
 
 Llama 3.1 is licensed under the Llama 3.1 Community License, Copyright © Meta Platforms, Inc. All Rights Reserved.
