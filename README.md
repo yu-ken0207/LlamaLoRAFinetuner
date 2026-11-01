@@ -29,8 +29,9 @@
 
 ### 先決條件
 
-* Python 3.10+
-* Conda（可選，但推薦使用）
+* Python 3.11+（實測 3.12）
+* NVIDIA 顯示卡（CUDA）
+* Conda（可選，用 venv 也可以）
 
 ### 安裝
 
@@ -39,12 +40,16 @@
    git clone https://github.com/yu-ken0207/LlamaLoRAFinetuner.git
    cd LlamaLoRAFinetuner
    ```
-2. 創建虛擬環境並安裝依賴：
+2. 創建虛擬環境：
    ```bash
    conda env create -f environment.yml
    conda activate LlamaLoRAFinetuner
    ```
-3. 安裝額外的 Python 依賴（如有需要）：
+3. 依顯示卡的 CUDA 版本安裝 torch（其他 CUDA 版本的指令見 [PyTorch 官網](https://pytorch.org/get-started/locally/)），例如 CUDA 13.0：
+   ```bash
+   pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu130
+   ```
+4. 安裝其他依賴：
    ```bash
    pip install -r requirements.txt
    ```
@@ -138,19 +143,18 @@ llama.save_model(local_path="outputs", hub_path="your-hf-username/test-model", t
 
 ## 環境配置
 
-> **注意**：`requirements.txt` 與 `environment.yml` 是 2025 年 1 月訓練時的環境快照（torch 2.5.1、transformers 4.47.1、unsloth 2024.12），為了能重現結果沒有更新，其中不少套件已有公開的安全漏洞。只建議在自己的電腦上訓練與測試，不要用這個環境對外提供服務；要長期使用，請換成新版套件重新訓練驗證。
+`requirements.txt` 是 2026 年 11 月實測過的版本（torch 2.14.1、transformers 5.17.0、trl 1.15.0、unsloth 2026.10.11），實測環境是 Linux ARM64、NVIDIA Blackwell 顯示卡、CUDA 13.0、Python 3.12：
 
-若需重建環境，可使用提供的 `environment.yml` 文件：
+* 照 `main.py` 的流程訓練 30 步，loss 從 3.47 降到 0.37；訓練出的權重載入後能輸出正確的動作類別。
+* 兩支 `inference_test_*.py` 載入 `outputs_*` 的權重推論正常。
 
-```bash
-conda env create -f environment.yml
-```
+x86 電腦照同樣步驟、把 torch 換成自己 CUDA 版本的安裝指令即可，但沒有實測。
 
-或使用 `requirements.txt`：
+已知還剩的漏洞：unsloth 目前只支援 datasets 5.0 以前的版本，datasets 4.8.5 與它限定版本的 fsspec 各有一個已知漏洞，分別出在「資料夾型資料集」與「Kerchunk 參考檔」，這個專案都沒有用到；等 unsloth 支援 datasets 5 再升級。
 
-```bash
-pip install -r requirements.txt
-```
+`data_process/` 的整理程式另外需要 ALFWorld 的環境，見 [ALFWorld](https://github.com/alfworld/alfworld) 的安裝說明。
+
+`outputs_*` 的權重是 2025 年 1 月用 torch 2.5.1、transformers 4.47.1、unsloth 2024.12 訓練的，當時完整的套件清單在 git 歷史裡。
 
 ---
 

@@ -1,20 +1,7 @@
-# environment.yml
-
+# conda env create -f environment.yml 之後，照 README 先裝 torch，再 pip install -r requirements.txt
 name: LlamaLoRAFinetuner
 channels:
-  - defaults
+  - conda-forge
 dependencies:
-  - python=3.10.16
+  - python=3.12
   - pip
-  - numpy=2.2.1
-  - pandas=2.2.3
-  - transformers=4.47.1
-  - torch=2.5.1
-  - datasets=3.2.0
-  - pip:
-    - unsloth==2024.12.12
-    - accelerate==1.2.1
-    - xformers==0.0.29.post1
-    - safetensors==0.4.5
-    - trl==0.13.0
-
