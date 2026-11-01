@@ -1,5 +1,7 @@
 # Llama 模型訓練
 
+[![Checks](https://github.com/yu-ken0207/LlamaLoRAFinetuner/actions/workflows/check.yml/badge.svg)](https://github.com/yu-ken0207/LlamaLoRAFinetuner/actions/workflows/check.yml)
+
 > A reusable pipeline for LoRA fine-tuning Llama 3.1 8B Instruct (4-bit, with Unsloth): load a Hugging Face dataset by naming its input and output fields, train with an instruction template, run inference, and push the result to the Hugging Face Hub. Used to train three small planning agents for household robot tasks from ALFRED / ALFWorld data: task decomposition, step-to-command planning and action classification (adapters included in `outputs_*`).
 
 **Built with Llama**：`outputs_*` 資料夾裡的 LoRA 權重由 Meta Llama 3.1 微調而來，授權見最下方。

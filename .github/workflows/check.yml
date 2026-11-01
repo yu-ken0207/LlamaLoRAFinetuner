@@ -1,0 +1,31 @@
+name: Checks
+
+# 訓練和推論要 NVIDIA 顯示卡，GitHub 的機器沒有，
+# 所以這裡只檢查程式語法，以及 requirements.txt 的版本組合裝不裝得起來。
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 程式語法
+        run: git ls-files -z '*.py' | xargs -0 python -m py_compile
+      # 用 uv 只讀各套件的版本資訊來解版本，不用下載好幾 GB 的 torch 和 CUDA 套件
+      - name: 套件版本組合
+        run: |
+          pip install uv==0.13.6
+          uv pip compile --quiet --python-version ${{ matrix.python-version }} requirements.txt -o /dev/null
